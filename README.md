@@ -1,4 +1,4 @@
-# Zabbix LDAP Integrator
+# Zabbix LDAP Integration
 
 ## Description
 
