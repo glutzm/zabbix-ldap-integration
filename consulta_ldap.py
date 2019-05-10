@@ -1,6 +1,6 @@
 # Created by: Gustavo Antonio Lutz de Matos
 # e-mail: gustavo.almatos@gmail.com
-# LDAP/AD Consult script that returns it in JSON
+# LDAP/AD Query script that returns it in JSON
 # Fonts:
 #   Stack Over Flow: https://stackoverflow.com/questions/4784775/ldap-query-in-python
 #   LDAP3 Documentation (https://ldap3.readthedocs.io/index.html)
@@ -13,8 +13,8 @@ import json
 # This class receives the following parameters to initialize your object:
 # server, username, password, basedn and memberof
 # You call the 'ldap_bind' to connect to the ldap/ad server, then you call the method 'ldap_search' so you can get the
-# users you need to consult
-class LDAPConsult:
+# users you need to query
+class LDAPQuery:
 
     def __init__(self, server, username, password, basedn, memberof):
         # connection attributes
@@ -97,5 +97,5 @@ if __name__ == "__main__":
         "Enter member group do filter users:\n"
         "e.g.: 'CN = zabbix.admins, OU = PathTo, OU = UserGroupWithAccess,DC=test,DC=com'\n"
     )
-    consult_object = LDAPConsult(server_input, username_input, password_input, basedn_input, memberof_input)
-    print(consult_object.ldap_search(consult_object.ldap_bind()))
+    query_object = LDAPQuery(server_input, username_input, password_input, basedn_input, memberof_input)
+    print(query_object.ldap_search(query_object.ldap_bind()))
