@@ -10,20 +10,24 @@ import sys
 import json
 
 
-class ConsultaLDAP:
+# This class receives the following parameters to initialize your object:
+# server, username, password, basedn and memberof
+# You call the 'ldap_bind' to connect to the ldap/ad server, then you call the method 'ldap_search' so you can get the
+# users you need to consult
+class LDAPConsult:
 
-    def __init__(self):
-        # super.__init__()
+    def __init__(self, server, username, password, basedn, memberof):
         # connection attributes
-        self.server = ldap3.Server('ldaps://auth.test.com:636')
-        self.username = "CN=Path,OU=To,OU=ReadUser,DC=test,DC=com"
-        self.password = "user_password"
-        self.basedn = "DC=test,DC=com"
+        self.server = ldap3.Server(server)
+        self.username = username
+        self.password = password
+        self.basedn = basedn
+        self.memberof = memberof
         # the filter "userAccountControl" is a definition to ignore disabled users
         # here we user the filter class to find users, member of a specific group, ignore disabled users
         # filter to not get class of computer and groups
-        self.searchFilter = "(&(objectclass=user)(memberOf=CN=zabbix.admins,OU=PathTo,OU=UserGroupWithAccess," \
-                            "DC=test,DC=com)(!(userAccountControl:1.2.840.113556.1.4.803:=2))" \
+        self.searchFilter = f"(&(objectclass=user)(memberOf={memberof})" \
+                            "(!(userAccountControl:1.2.840.113556.1.4.803:=2))" \
                             "(!(objectclass=computer))(!(objectclass=group)))"
         # attributes that you want the LDAP/AD to return
         self.searchAttribute = ['sAMAccountName', 'givenName', 'sn']
@@ -50,8 +54,7 @@ class ConsultaLDAP:
 
     # This function searches for the attributes and filters you selected
     # and return a dictionary of users
-    def ldap_search(self):
-        ldap_conn = ConsultaLDAP().ldap_bind()
+    def ldap_search(self, ldap_conn):
         i = 0
         users = {}
         try:
@@ -75,4 +78,24 @@ class ConsultaLDAP:
 
 # Script beginning
 if __name__ == "__main__":
-    print(ConsultaLDAP().ldap_search())
+    server_input = input(
+        "Enter the server connection:\n"
+        "e.g.: 'ldaps://auth.test.com:636'\n"
+    )
+    username_input = input(
+        "Enter user to bind the ldap/ad:\n"
+        "e.g.: 'CN=Path,OU=To,OU=ReadUser,DC=test,DC=com'\n"
+    )
+    password_input = input(
+        "Enter the user password:\n"
+    )
+    basedn_input = input(
+        "Enter the base DN to search through:\n"
+        "e.g.: 'DC=test,DC=com'\n"
+    )
+    memberof_input = input(
+        "Enter member group do filter users:\n"
+        "e.g.: 'CN = zabbix.admins, OU = PathTo, OU = UserGroupWithAccess,DC=test,DC=com'\n"
+    )
+    consult_object = LDAPConsult(server_input, username_input, password_input, basedn_input, memberof_input)
+    print(consult_object.ldap_search(consult_object.ldap_bind()))
