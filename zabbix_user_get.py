@@ -6,12 +6,14 @@ import sys
 import requests
 import json
 from ldap_query import LDAPQuery
-from zabbix_api import ZabbixAPI
+from pyzabbix import ZabbixAPI
 
 
 def get_zabbix_user_list(zabbix_server, zabbix_username, zabbix_password):
     zapi = ZabbixAPI(zabbix_server)
     zapi.login(zabbix_username, zabbix_password)
+    print("Connected to Zabbix API Version %s" % zapi.api_version())
+    print(zapi.user.get(output="extend"))
 
     # zapi.logout()
 
