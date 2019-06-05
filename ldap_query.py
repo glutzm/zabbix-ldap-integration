@@ -95,7 +95,7 @@ if __name__ == "__main__":
     )
     memberof_input = input(
         "Enter member group do filter users:\n"
-        "e.g.: 'CN = zabbix.admins, OU = PathTo, OU = UserGroupWithAccess,DC=test,DC=com'\n"
+        "e.g.: 'CN=zabbix.admins,OU=PathTo,OU=UserGroupWithAccess,DC=test,DC=com'\n"
     )
     query_object = LDAPQuery(server_input, username_input, password_input, basedn_input, memberof_input)
     print(query_object.ldap_search(query_object.ldap_bind()))
