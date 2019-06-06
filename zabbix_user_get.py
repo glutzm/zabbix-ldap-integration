@@ -27,6 +27,30 @@ class ZabbixModule:
         return self.zabbix_user_id_list
 
 
+class LDAPModule:
+
+    def __init__(self, ldap_server, ldap_user, ldap_password, ldap_basedn, ldap_memberof):
+        self.ldap_server = ldap_server
+        self.ldap_user = ldap_user
+        self.ldap_password = ldap_password
+        self.ldap_basedn = ldap_basedn
+        self.ldap_memberof = ldap_memberof
+        self.ldap_connection_obj = LDAPQuery(
+            self.ldap_server,
+            self.ldap_user,
+            self.ldap_password,
+            self.ldap_basedn,
+            self.ldap_memberof
+        )
+        self.ldap_users_list_obj = self.ldap_connection_obj.ldap_search(self.ldap_connection_obj.ldap_bind())
+        self.ldap_ids = []
+
+    def get_ldap_user_list(self):
+        for account_name_filter in self.ldap_users_list_obj:
+            self.ldap_ids.append(account_name_filter['sAMAccountName'])
+        return self.ldap_ids
+
+
 if __name__ == "__main__":
     zapi_srv_input = input("Enter the Zabbix server address:\n")
     zapi_user_input = input("Enter the Zabbix user to login:\n")
@@ -50,16 +74,14 @@ if __name__ == "__main__":
         "Enter member group do filter users:\n"
         "e.g.: 'CN=zabbix.admins,OU=PathTo,OU=UserGroupWithAccess,DC=test,DC=com'\n"
     )
-    ldap_connection_obj = LDAPQuery(srv_input, ldap_user_input, ldap_pass_input, basedn_input, memberof_input)
-    ldap_users_list = ldap_connection_obj.ldap_search(ldap_connection_obj.ldap_bind())
-    ldap_ids = []
 
-    for account_name_filter in ldap_users_list:
-        ldap_ids.append(account_name_filter['sAMAccountName'])
+    ldap_user_obj = LDAPModule(srv_input, ldap_user_input, ldap_pass_input, basedn_input, memberof_input)
+    ldap_users_list = ldap_user_obj.get_ldap_user_list()
 
     zabbix_user_obj = ZabbixModule(zapi_srv_input, zapi_user_input, zapi_pass_input)
     zabbix_user_list = zabbix_user_obj.get_zabbix_user_list()
-    for ldap_login in ldap_ids:
+
+    for ldap_login in ldap_users_list:
         if ldap_login not in zabbix_user_list:
             print(ldap_login)
         else:
