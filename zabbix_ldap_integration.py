@@ -1,8 +1,9 @@
 # Created by: Gustavo Antonio Lutz de Matos
 # e-mail: gustavo.almatos@gmail.com
-# Zabbix and LDAP user compare
+# Zabbix and LDAP Integration
 
 from zabbix_user_get import ZabbixGetModule
+from zabbix_user_create import ZabbixCreateModule
 from zabbix_api_connection import ZabbixConnectionModule
 from ldap_query import LDAPQuery
 
@@ -49,6 +50,10 @@ class ZabbixLDAPIntegration:
             self.ldap_memberof
         )
         return query_object.ldap_search(query_object.ldap_bind())
+
+    def create_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
+        zabbix_create_user = ZabbixCreateModule(self.zabbix_connection_obj.zabbix_api_connect())
+        zabbix_create_user.create_zabbix_user(ldap_samaccountname, ldap_givenname, ldap_sn)
 
 
 def compare_users_function(zabbix_login_list, ldap_user_list):
