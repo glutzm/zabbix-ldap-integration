@@ -2,9 +2,6 @@
 # e-mail: gustavo.almatos@gmail.com
 # Zabbix user.get via API
 
-import sys
-import requests
-import json
 from ldap_query import LDAPQuery
 from pyzabbix import ZabbixAPI
 
