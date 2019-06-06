@@ -24,3 +24,5 @@ if __name__ == "__main__":
     zabbix_server_input = input("Enter the Zabbix server address:\n")
     zabbix_user_input = input("Enter the Zabbix user to login:\n")
     zabbix_pass_input = input("Enter the Zabbix user password:\n")
+
+    zabbix_connection_obj = ZabbixConnectionModule(zabbix_server_input, zabbix_user_input, zabbix_pass_input)
