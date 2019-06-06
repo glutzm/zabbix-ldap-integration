@@ -56,7 +56,7 @@ class LDAPQuery:
     # and return a dictionary of users
     def ldap_search(self, ldap_conn):
         i = 0
-        users = {}
+        users = []
         try:
             # Search the LDAP/AD with the parameters received from the object creation
             entry_list = ldap_conn.extend.standard.paged_search(
@@ -64,7 +64,7 @@ class LDAPQuery:
             )
             for entry in entry_list:
                 i = str(i)
-                users['user'+i] = dict(entry['attributes'])
+                users.append(dict(entry['attributes']))
                 i = int(i)
                 i += 1
         except ldap3.core.exceptions.LDAPBindError as e:
@@ -72,8 +72,7 @@ class LDAPQuery:
         # unbind the session with the LDAP/AD server
         ldap_conn.unbind()
         # transform the users result into json
-        users_json = json.dumps(users)
-        return users_json
+        return users
 
 
 # Script beginning
