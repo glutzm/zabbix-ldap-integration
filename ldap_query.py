@@ -7,7 +7,6 @@
 
 import ldap3
 import sys
-import json
 
 
 # This class receives the following parameters to initialize your object:
