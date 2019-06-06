@@ -9,13 +9,22 @@ from ldap_query import LDAPQuery
 from pyzabbix import ZabbixAPI
 
 
-def get_zabbix_user_list(zabbix_server, zabbix_username, zabbix_password):
-    zapi = ZabbixAPI(zabbix_server)
-    zapi.login(zabbix_username, zabbix_password)
-    print("Connected to Zabbix API Version %s" % zapi.api_version())
-    print(zapi.user.get(output="extend"))
+class ZabbixModule:
 
-    # zapi.logout()
+    def __init__(self, zabbix_server, zabbix_username, zabbix_password):
+        self.zabbix_server = zabbix_server
+        self.zabbix_username = zabbix_username
+        self.zabbix_password = zabbix_password
+        self.zapi = ZabbixAPI(self.zabbix_server)
+        self.zapi.login(self.zabbix_username, self.zabbix_password)
+        self.zabbix_user_id_list = []
+        print("Connected to Zabbix API Version %s" % self.zapi.api_version())
+
+    def get_zabbix_user_list(self):
+        # print(self.zapi.user.get(output="extend"))
+        for self.id in self.zapi.user.get(output="extend"):
+            self.zabbix_user_id_list.append(self.id['alias'])
+        return self.zabbix_user_id_list
 
 
 if __name__ == "__main__":
@@ -39,8 +48,20 @@ if __name__ == "__main__":
     )
     memberof_input = input(
         "Enter member group do filter users:\n"
-        "e.g.: 'CN = zabbix.admins, OU = PathTo, OU = UserGroupWithAccess,DC=test,DC=com'\n"
+        "e.g.: 'CN=zabbix.admins,OU=PathTo,OU=UserGroupWithAccess,DC=test,DC=com'\n"
     )
-    users_list = LDAPQuery(srv_input, ldap_user_input, ldap_pass_input, basedn_input, memberof_input)
-    print(users_list.ldap_search(users_list.ldap_bind()))
-    get_zabbix_user_list(zapi_srv_input, zapi_user_input, zapi_pass_input)
+    ldap_connection_obj = LDAPQuery(srv_input, ldap_user_input, ldap_pass_input, basedn_input, memberof_input)
+    ldap_users_list = ldap_connection_obj.ldap_search(ldap_connection_obj.ldap_bind())
+    ldap_ids = []
+
+    for account_name_filter in ldap_users_list:
+        ldap_ids.append(account_name_filter['sAMAccountName'])
+
+    zabbix_user_obj = ZabbixModule(zapi_srv_input, zapi_user_input, zapi_pass_input)
+    zabbix_user_list = zabbix_user_obj.get_zabbix_user_list()
+    for ldap_login in ldap_ids:
+        if ldap_login not in zabbix_user_list:
+            print(ldap_login)
+        else:
+            print(
+                f"{ldap_login} already in Zabbix!")
