@@ -6,9 +6,8 @@
     
 ## Problem
 
-> Zabbix does integrates already with LDAP/AD, but only authentication. 
-In order to use it you have to manually add the user to the Zabbix DB in the 
-frontend.
+> Zabbix does already integrate with LDAP/AD, but only authentication. In order to 
+use it you have to manually add the user to Zabbix frontend.
     
 ## Proposition
 
