@@ -40,12 +40,12 @@ class LDAPModule:
             self.ldap_memberof
         )
         self.ldap_users_list_obj = self.ldap_connection_obj.ldap_search(self.ldap_connection_obj.ldap_bind())
-        self.ldap_ids = []
+        self.ldap_login_list = []
 
     def get_ldap_user_list(self):
         for account_name_filter in self.ldap_users_list_obj:
-            self.ldap_ids.append(account_name_filter['sAMAccountName'])
-        return self.ldap_ids
+            self.ldap_login_list.append(account_name_filter['sAMAccountName'])
+        return self.ldap_login_list
 
 
 if __name__ == "__main__":
