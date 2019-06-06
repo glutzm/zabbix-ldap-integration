@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     ldap_samaccountname = "glutz"
     ldap_givenname = "Gustavo"
-    ldap_sn = "Lutz de Matos"
+    ldap_sn = "Antonio Lutz de Matos"
 
     zabbix_connection_obj = ZabbixConnectionModule(zabbix_server_input, zabbix_user_input, zabbix_pass_input)
     zabbix_create_user = ZabbixCreateModule(zabbix_connection_obj.zabbix_api_connect())
