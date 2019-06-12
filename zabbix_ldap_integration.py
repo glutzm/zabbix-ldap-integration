@@ -38,6 +38,7 @@ class ZabbixLDAPIntegration:
         self.ldap_memberof = ldap_memberof
 
     def get_zabbix_users_function(self):
+        print("Zabbix user.get method!")
         zabbix_user_list = ZabbixGetModule(self.zabbix_connection_obj.zabbix_api_connect())
         return zabbix_user_list.get_zabbix_user_list()
 
@@ -52,9 +53,9 @@ class ZabbixLDAPIntegration:
         return query_object.ldap_search(query_object.ldap_bind())
 
     def create_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
+        print("Zabbix user.create method!")
         zabbix_create_user = ZabbixCreateModule(self.zabbix_connection_obj.zabbix_api_connect())
         zabbix_create_user.create_zabbix_user(ldap_samaccountname, ldap_givenname, ldap_sn)
-        exit()
 
     def update_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
         exit()
@@ -66,15 +67,23 @@ class ZabbixLDAPIntegration:
         exit()
 
 
-def compare_users_function(zabbix_login_list, ldap_user_list):
+def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bind_user):
+    zabbix_login_list = []
+    for user_alias in zabbix_user_list:
+        zabbix_login_list.append(user_alias['alias'])
+
+    zabbix_login_list.remove('Admin')
+    zabbix_login_list.remove('guest')
+    zabbix_login_list.remove(bind_user)
+
     for account_name in ldap_user_list:
         if account_name['sAMAccountName'] not in zabbix_login_list:
-            print(account_name['sn'])
-            ZabbixLDAPIntegration.create_zabbix_users_function(
+            zabbix_conn_obj.create_zabbix_users_function(
                 account_name['sAMAccountName'],
                 account_name['givenName'],
                 account_name['sn']
             )
+            print(f"User {account_name['givenName']} {account_name['sn']} added!\n")
 
 
 if __name__ == "__main__":
@@ -115,5 +124,5 @@ if __name__ == "__main__":
 
     zbx_usr_list = compare_obj.get_zabbix_users_function()
     ldap_usr_list = compare_obj.get_ldap_users_function()
-    compare_users_function(zbx_usr_list, ldap_usr_list)
+    compare_users_function(compare_obj, zbx_usr_list, ldap_usr_list, zabbix_user_input)
     exit()
