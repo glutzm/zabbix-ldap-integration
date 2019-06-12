@@ -10,13 +10,9 @@ class ZabbixGetModule(ZabbixConnectionModule):
     def __init__(self, zabbix_server):
         super(ZabbixConnectionModule, self).__init__()
         self.zabbix_server = zabbix_server
-        self.zabbix_user_id_list = []
 
     def get_zabbix_user_list(self):
-        # print(self.zabbix_server.user.get(output="extend"))
-        for self.id in self.zabbix_server.user.get(output="extend"):
-            self.zabbix_user_id_list.append(self.id['alias'])
-        return self.zabbix_user_id_list
+        return self.zabbix_server.user.get(output="extend")
 
 
 if __name__ == "__main__":
