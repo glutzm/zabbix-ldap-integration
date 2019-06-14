@@ -4,6 +4,7 @@
 
 from zabbix_user_get import ZabbixGetModule
 from zabbix_user_create import ZabbixCreateModule
+from zabbix_user_delete import ZabbixDeleteModule
 from zabbix_api_connection import ZabbixConnectionModule
 from ldap_query import LDAPQuery
 
@@ -57,14 +58,16 @@ class ZabbixLDAPIntegration:
         zabbix_create_user = ZabbixCreateModule(self.zabbix_connection_obj.zabbix_api_connect())
         zabbix_create_user.create_zabbix_user(ldap_samaccountname, ldap_givenname, ldap_sn)
 
-    def update_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
+    def update_zabbix_users_function(self, zabbix_user_id):
         exit()
 
     def disable_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
         exit()
 
-    def delete_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
-        exit()
+    def delete_zabbix_users_function(self, zabbix_user_id):
+        print("Zabbix user.delete method!")
+        zabbix_delete_user = ZabbixDeleteModule(self.zabbix_connection_obj.zabbix_api_connect())
+        zabbix_delete_user.delete_zabbix_user(zabbix_user_id)
 
 
 def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bind_user):
@@ -94,9 +97,15 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
 
     # Check if the user needs to be removed
     for account_name in zabbix_user_list:
-        if account_name['alias'] not in ldap_login_list:
-            zabbix_conn_obj.delete_zabbix_users_function()
-            print(f"User {account_name['givenName']} {account_name['sn']} removed!\n")
+        if (
+                account_name['alias'] == bind_user or
+                account_name['alias'] == 'Admin' or
+                account_name['alias'] == 'guest'
+        ):
+            continue
+        elif account_name['alias'] not in ldap_login_list:
+            zabbix_conn_obj.delete_zabbix_users_function(account_name['userid'])
+            print(f"User {account_name['name']} {account_name['surname']} removed!\n")
 
 
 if __name__ == "__main__":
