@@ -68,14 +68,21 @@ class ZabbixLDAPIntegration:
 
 
 def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bind_user):
+    # Create zabbix user list to do checks
     zabbix_login_list = []
     for user_alias in zabbix_user_list:
         zabbix_login_list.append(user_alias['alias'])
+
+    # Create ldap user list to do checks
+    ldap_login_list = []
+    for user_alias in ldap_user_list:
+        ldap_login_list.append(user_alias['sAMAccountName'])
 
     zabbix_login_list.remove('Admin')
     zabbix_login_list.remove('guest')
     zabbix_login_list.remove(bind_user)
 
+    # Check if the user needs to be created
     for account_name in ldap_user_list:
         if account_name['sAMAccountName'] not in zabbix_login_list:
             zabbix_conn_obj.create_zabbix_users_function(
@@ -84,6 +91,12 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
                 account_name['sn']
             )
             print(f"User {account_name['givenName']} {account_name['sn']} added!\n")
+
+    # Check if the user needs to be removed
+    for account_name in zabbix_user_list:
+        if account_name['alias'] not in ldap_login_list:
+            zabbix_conn_obj.delete_zabbix_users_function()
+            print(f"User {account_name['givenName']} {account_name['sn']} removed!\n")
 
 
 if __name__ == "__main__":
