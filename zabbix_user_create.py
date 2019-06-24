@@ -7,6 +7,8 @@
 # Source: https://github.com/zabbix-tooling/zabbix-ldap-sync
 
 from zabbix_api_connection import ZabbixConnectionModule
+import sys
+import pyzabbix
 
 
 class ZabbixCreateModule(ZabbixConnectionModule):
@@ -29,7 +31,11 @@ class ZabbixCreateModule(ZabbixConnectionModule):
         self.new_zabbix_user.update(self.new_zabbix_user_defaults)
 
         # The variable user_object can be an array/list of users
-        self.zabbix_server.do_request('user.create', self.new_zabbix_user)
+        try:
+            self.zabbix_server.do_request('user.create', self.new_zabbix_user)
+        except pyzabbix.ZabbixAPIException as error_message:
+            print(error_message)
+            sys.exit()
 
 
 if __name__ == "__main__":
