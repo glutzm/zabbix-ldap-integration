@@ -7,6 +7,8 @@
 # Source: https://github.com/zabbix-tooling/zabbix-ldap-sync
 
 from zabbix_api_connection import ZabbixConnectionModule
+import sys
+import pyzabbix
 
 
 class ZabbixDeleteModule(ZabbixConnectionModule):
@@ -21,7 +23,14 @@ class ZabbixDeleteModule(ZabbixConnectionModule):
             "userids": f"{ids}"
         }
 
-        self.zabbix_server.do_request('user.delete', self.zabbix_user_id)
+        try:
+            self.zabbix_server.do_request('user.delete', self.zabbix_user_id)
+        except pyzabbix.ZabbixAPIException as error_message:
+            if 'Error -32602' in error_message:
+                print(f"Was not possible to delete user {self.zabbix_user_id}!\n", error_message)
+            else:
+                print(error_message)
+                sys.exit()
 
 
 if __name__ == "__main__":
