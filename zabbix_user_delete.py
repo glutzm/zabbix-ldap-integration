@@ -26,11 +26,17 @@ class ZabbixDeleteModule(ZabbixConnectionModule):
         try:
             self.zabbix_server.do_request('user.delete', self.zabbix_user_id)
         except pyzabbix.ZabbixAPIException as error_message:
+            error_message = str(error_message)
             if 'Error -32602' in error_message:
-                print(f"Was not possible to delete user {self.zabbix_user_id}!\n", error_message)
+                print(
+                    "Was not possible to delete the user because it's already set in some action!\n",
+                    error_message
+                )
+                return 0
             else:
                 print(error_message)
-                sys.exit()
+                return 0
+        return 1
 
 
 if __name__ == "__main__":

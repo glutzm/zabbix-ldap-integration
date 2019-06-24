@@ -35,7 +35,8 @@ class ZabbixCreateModule(ZabbixConnectionModule):
             self.zabbix_server.do_request('user.create', self.new_zabbix_user)
         except pyzabbix.ZabbixAPIException as error_message:
             print(error_message)
-            sys.exit()
+            return 0
+        return 1
 
 
 if __name__ == "__main__":
