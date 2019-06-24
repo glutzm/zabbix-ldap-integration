@@ -54,23 +54,28 @@ class LDAPQuery:
     # This function searches for the attributes and filters you selected
     # and return a dictionary of users
     def ldap_search(self, ldap_conn):
-        i = 0
         users = []
         try:
             # Search the LDAP/AD with the parameters received from the object creation
             entry_list = ldap_conn.extend.standard.paged_search(
-                self.basedn, self.searchFilter, self.searchScope, self.dereference_aliases, self.searchAttribute
+                self.basedn,
+                self.searchFilter,
+                self.searchScope,
+                self.dereference_aliases,
+                self.searchAttribute,
+                paged_size=5,
+                generator=False
             )
+            # print(entry_list)
             for entry in entry_list:
-                i = str(i)
-                users.append(dict(entry['attributes']))
-                i = int(i)
-                i += 1
+                try:
+                    users.append(dict(entry['attributes']))
+                except KeyError:
+                    continue
         except ldap3.core.exceptions.LDAPBindError as e:
             print(e)
         # unbind the session with the LDAP/AD server
         ldap_conn.unbind()
-        # transform the users result into json
         return users
 
 
