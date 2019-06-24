@@ -81,12 +81,14 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
     for user_alias in ldap_user_list:
         ldap_login_list.append(user_alias['sAMAccountName'])
 
-    zabbix_login_list.remove('Admin')
-    zabbix_login_list.remove('guest')
-    zabbix_login_list.remove(bind_user)
-
     # Check if the user needs to be created
     for account_name in ldap_user_list:
+        if (
+                account_name['sAMAccountName'] == bind_user or
+                account_name['sAMAccountName'] == 'Admin' or
+                account_name['sAMAccountName'] == 'guest'
+        ):
+            continue
         if account_name['sAMAccountName'] not in zabbix_login_list:
             zabbix_conn_obj.create_zabbix_users_function(
                 account_name['sAMAccountName'],
