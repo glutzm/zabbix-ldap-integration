@@ -3,6 +3,8 @@
 # Zabbix user.get via API
 
 from zabbix_api_connection import ZabbixConnectionModule
+import sys
+import pyzabbix
 
 
 class ZabbixGetModule(ZabbixConnectionModule):
@@ -12,7 +14,11 @@ class ZabbixGetModule(ZabbixConnectionModule):
         self.zabbix_server = zabbix_server
 
     def get_zabbix_user_list(self):
-        return self.zabbix_server.user.get(output="extend")
+        try:
+            return self.zabbix_server.user.get(output="extend")
+        except pyzabbix.ZabbixAPIException as error_message:
+            print(error_message)
+            sys.exit()
 
 
 if __name__ == "__main__":
