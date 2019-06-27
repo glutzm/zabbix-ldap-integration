@@ -56,7 +56,7 @@ class ZabbixLDAPIntegration:
     def create_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
         print("Zabbix user.create method!")
         zabbix_create_user = ZabbixCreateModule(self.zabbix_connection_obj.zabbix_api_connect())
-        zabbix_create_user.create_zabbix_user(ldap_samaccountname, ldap_givenname, ldap_sn)
+        return zabbix_create_user.create_zabbix_user(ldap_samaccountname, ldap_givenname, ldap_sn)
 
     def update_zabbix_users_function(self, zabbix_user_id):
         exit()
@@ -67,7 +67,7 @@ class ZabbixLDAPIntegration:
     def delete_zabbix_users_function(self, zabbix_user_id):
         print("Zabbix user.delete method!")
         zabbix_delete_user = ZabbixDeleteModule(self.zabbix_connection_obj.zabbix_api_connect())
-        zabbix_delete_user.delete_zabbix_user(zabbix_user_id)
+        return zabbix_delete_user.delete_zabbix_user(zabbix_user_id)
 
 
 def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bind_user):
