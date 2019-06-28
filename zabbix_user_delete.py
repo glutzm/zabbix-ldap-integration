@@ -27,7 +27,7 @@ class ZabbixDeleteModule(ZabbixConnectionModule):
         try:
             self.zabbix_server.do_request('user.delete', self.zabbix_user_id)
         except pyzabbix.ZabbixAPIException as error_message:
-            print(self.current_time.strftime("%Y-%m-%d %H:%M"), error_message, "\n")
+            print(self.current_time.strftime("%Y-%m-%d %H:%M"), error_message)
             return 0
         return 1
 
