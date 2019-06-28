@@ -97,7 +97,7 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
             if result == 1:
                 current_time = datetime.datetime.now()
                 print(
-                    current_time.strftime("%Y-%m-%d %H:%M"),
+                    current_time.strftime("[%Y-%m-%d %H:%M:%S]"),
                     f"User {account_name['givenName']} {account_name['sn']} added!\n"
                 )
 
@@ -114,7 +114,7 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
             if result == 1:
                 current_time = datetime.datetime.now()
                 print(
-                    current_time.strftime("%Y-%m-%d %H:%M"),
+                    current_time.strftime("[%Y-%m-%d %H:%M:%S]"),
                     f"User {account_name['name']} {account_name['surname']} removed!\n"
                 )
 
@@ -142,9 +142,10 @@ if __name__ == "__main__":
     )
 
     start_time = datetime.datetime.now()
-
+    print(start_time.strftime("[%Y-%m-%d %H:%M:%S]"), "Begin of the script.")
     zbx_usr_list = compare_obj.get_zabbix_users_function()
     ldap_usr_list = compare_obj.get_ldap_users_function()
     compare_users_function(compare_obj, zbx_usr_list, ldap_usr_list, zabbix_user_input)
-    print(start_time.strftime("%Y-%m-%d %H:%M"), "End of the script.")
+    finish_time = datetime.datetime.now()
+    print(finish_time.strftime("[%Y-%m-%d %H:%M:%S]"), "End of the script.")
     exit()
