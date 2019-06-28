@@ -3,7 +3,7 @@
 # Zabbix user.get via API
 
 from zabbix_api_connection import ZabbixConnectionModule
-import sys
+import datetime
 import pyzabbix
 
 
@@ -12,13 +12,14 @@ class ZabbixGetModule(ZabbixConnectionModule):
     def __init__(self, zabbix_server):
         super(ZabbixConnectionModule, self).__init__()
         self.zabbix_server = zabbix_server
+        self.current_time = datetime.datetime.now()
 
     def get_zabbix_user_list(self):
         try:
             return self.zabbix_server.user.get(output="extend")
         except pyzabbix.ZabbixAPIException as error_message:
-            print(error_message)
-            sys.exit()
+            print(self.current_time.strftime("%Y-%m-%d %H:%M"), error_message, "\n")
+            return 0
 
 
 if __name__ == "__main__":

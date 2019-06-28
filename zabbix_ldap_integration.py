@@ -7,6 +7,7 @@ from zabbix_user_create import ZabbixCreateModule
 from zabbix_user_delete import ZabbixDeleteModule
 from zabbix_api_connection import ZabbixConnectionModule
 from ldap_query import LDAPQuery
+import datetime
 
 
 class ZabbixLDAPIntegration:
@@ -97,9 +98,11 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
                 account_name['sn']
             )
             if result == 1:
-                print(f"User {account_name['givenName']} {account_name['sn']} added!\n")
-            else:
-                print(f"User {account_name['givenName']} {account_name['sn']} NOT added!\n")
+                current_time = datetime.datetime.now()
+                print(
+                    current_time.strftime("%Y-%m-%d %H:%M"),
+                    f"User {account_name['givenName']} {account_name['sn']} added!\n"
+                )
 
     # Check if the user needs to be removed
     for account_name in zabbix_user_list:
@@ -112,35 +115,23 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
         elif account_name['alias'] not in ldap_login_list:
             result = zabbix_conn_obj.delete_zabbix_users_function(account_name['userid'])
             if result == 1:
-                print(f"User {account_name['name']} {account_name['surname']} removed!\n")
-            else:
-                print(f"User {account_name['name']} {account_name['surname']} NOT removed!\n")
+                current_time = datetime.datetime.now()
+                print(
+                    current_time.strftime("%Y-%m-%d %H:%M"),
+                    f"User {account_name['name']} {account_name['surname']} removed!\n"
+                )
 
 
 if __name__ == "__main__":
-    zabbix_server_input = input("Enter the Zabbix server address:\n")
-    zabbix_user_input = input("Enter the Zabbix user to login:\n")
-    zabbix_pass_input = input("Enter the Zabbix user password:\n")
+    zabbix_server_input = input()
+    zabbix_user_input = input()
+    zabbix_pass_input = input()
 
-    ldap_server_input = input(
-        "Enter the server connection:\n"
-        "e.g.: 'ldaps://auth.test.com:636'\n"
-    )
-    ldap_username_input = input(
-        "Enter user to bind the ldap/ad:\n"
-        "e.g.: 'CN=Path,OU=To,OU=ReadUser,DC=test,DC=com'\n"
-    )
-    ldap_password_input = input(
-        "Enter the user password:\n"
-    )
-    ldap_basedn_input = input(
-        "Enter the base DN to search through:\n"
-        "e.g.: 'DC=test,DC=com'\n"
-    )
-    ldap_memberof_input = input(
-        "Enter member group do filter users:\n"
-        "e.g.: 'CN=zabbix.admins,OU=PathTo,OU=UserGroupWithAccess,DC=test,DC=com'\n"
-    )
+    ldap_server_input = input()
+    ldap_username_input = input()
+    ldap_password_input = input()
+    ldap_basedn_input = input()
+    ldap_memberof_input = input()
 
     compare_obj = ZabbixLDAPIntegration(
         zabbix_server_input,
@@ -153,7 +144,10 @@ if __name__ == "__main__":
         ldap_memberof_input
     )
 
+    start_time = datetime.datetime.now()
+
     zbx_usr_list = compare_obj.get_zabbix_users_function()
     ldap_usr_list = compare_obj.get_ldap_users_function()
     compare_users_function(compare_obj, zbx_usr_list, ldap_usr_list, zabbix_user_input)
+    print(start_time.strftime("%Y-%m-%d %H:%M"), "End of the script.")
     exit()

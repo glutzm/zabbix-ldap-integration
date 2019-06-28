@@ -7,7 +7,7 @@
 # Source: https://github.com/zabbix-tooling/zabbix-ldap-sync
 
 from zabbix_api_connection import ZabbixConnectionModule
-import sys
+import datetime
 import pyzabbix
 
 
@@ -17,6 +17,7 @@ class ZabbixDeleteModule(ZabbixConnectionModule):
         super(ZabbixConnectionModule, self).__init__()
         self.zabbix_server = zabbix_server
         self.zabbix_user_id = {}
+        self.current_time = datetime.datetime.now()
 
     def delete_zabbix_user(self, ids):
         self.zabbix_user_id = {
@@ -26,16 +27,8 @@ class ZabbixDeleteModule(ZabbixConnectionModule):
         try:
             self.zabbix_server.do_request('user.delete', self.zabbix_user_id)
         except pyzabbix.ZabbixAPIException as error_message:
-            error_message = str(error_message)
-            if 'Error -32602' in error_message:
-                print(
-                    "Was not possible to delete the user because it's already set in some action!\n",
-                    error_message
-                )
-                return 0
-            else:
-                print(error_message)
-                return 0
+            print(self.current_time.strftime("%Y-%m-%d %H:%M"), error_message, "\n")
+            return 0
         return 1
 
 

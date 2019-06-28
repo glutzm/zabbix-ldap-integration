@@ -7,7 +7,7 @@
 # Source: https://github.com/zabbix-tooling/zabbix-ldap-sync
 
 from zabbix_api_connection import ZabbixConnectionModule
-import sys
+import datetime
 import pyzabbix
 
 
@@ -23,6 +23,7 @@ class ZabbixCreateModule(ZabbixConnectionModule):
             'usrgrps': [{'usrgrpid': '7'}],
             'lang': "pt_BR"
         }
+        self.current_time = datetime.datetime.now()
 
     def create_zabbix_user(self, alias, name, surname):
         self.new_zabbix_user['alias'] = alias
@@ -34,7 +35,7 @@ class ZabbixCreateModule(ZabbixConnectionModule):
         try:
             self.zabbix_server.do_request('user.create', self.new_zabbix_user)
         except pyzabbix.ZabbixAPIException as error_message:
-            print(error_message)
+            print(self.current_time.strftime("%Y-%m-%d %H:%M"), error_message, "\n")
             return 0
         return 1
 
