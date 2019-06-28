@@ -18,7 +18,7 @@ class ZabbixGetModule(ZabbixConnectionModule):
         try:
             return self.zabbix_server.user.get(output="extend")
         except pyzabbix.ZabbixAPIException as error_message:
-            print(self.current_time.strftime("%Y-%m-%d %H:%M"), error_message)
+            print(self.current_time.strftime("[%Y-%m-%d %H:%M:%S]"), error_message)
             return 0
 
 

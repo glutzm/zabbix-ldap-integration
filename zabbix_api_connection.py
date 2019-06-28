@@ -19,12 +19,12 @@ class ZabbixConnectionModule(object):
         try:
             self.zabbix_server.login(self.zabbix_username, self.zabbix_password)
             print(
-                self.current_time.strftime("%Y-%m-%d %H:%M"),
+                self.current_time.strftime("[%Y-%m-%d %H:%M:%S]"),
                 "Connected to Zabbix API Version %s" % self.zabbix_server.api_version(),
             )
             return self.zabbix_server
         except ZabbixAPI.ZabbixAPIException as error_message:
-            print(self.current_time.strftime("%Y-%m-%d %H:%M"), error_message)
+            print(self.current_time.strftime("[%Y-%m-%d %H:%M:%S]"), error_message)
 
 
 if __name__ == "__main__":
