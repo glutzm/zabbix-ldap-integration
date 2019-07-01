@@ -8,7 +8,14 @@
 
 > Zabbix does already integrate with LDAP/AD, but only authentication. In order to 
 use it you have to manually add the user to Zabbix frontend.
-    
+
+## Requirements
+
+- Python 3.x.x
+  - pyzabbix
+  - ldap3
+- Zabbix 4.2 (only version tested)
+
 ## How to use
 
 > You can create a cron job that calls the script "zabbix_ldap_integration.py" and 
