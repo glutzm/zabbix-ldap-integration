@@ -7,7 +7,8 @@ from zabbix_user_create import ZabbixCreateModule
 from zabbix_user_delete import ZabbixDeleteModule
 from zabbix_api_connection import ZabbixConnectionModule
 from ldap_query import LDAPQuery
-import datetime
+import logging
+import sys
 
 
 class ZabbixLDAPIntegration:
@@ -57,15 +58,15 @@ class ZabbixLDAPIntegration:
         zabbix_create_user = ZabbixCreateModule(self.zabbix_connection_obj.zabbix_api_connect())
         return zabbix_create_user.create_zabbix_user(ldap_samaccountname, ldap_givenname, ldap_sn)
 
-    def update_zabbix_users_function(self, zabbix_user_id):
-        exit()
+    # def update_zabbix_users_function(self, zabbix_user_id):
+    #     exit()
+    #
+    # def disable_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
+    #     exit()
 
-    def disable_zabbix_users_function(self, ldap_samaccountname, ldap_givenname, ldap_sn):
-        exit()
-
-    def delete_zabbix_users_function(self, zabbix_user_id):
+    def delete_zabbix_users_function(self, zabbix_user_id, zabbix_user_name, zabbix_user_surname):
         zabbix_delete_user = ZabbixDeleteModule(self.zabbix_connection_obj.zabbix_api_connect())
-        return zabbix_delete_user.delete_zabbix_user(zabbix_user_id)
+        return zabbix_delete_user.delete_zabbix_user(zabbix_user_id, zabbix_user_name, zabbix_user_surname)
 
 
 def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bind_user):
@@ -95,11 +96,7 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
                 account_name['sn']
             )
             if result == 1:
-                current_time = datetime.datetime.now()
-                print(
-                    current_time.strftime("[%Y-%m-%d %H:%M:%S]"),
-                    f"User {account_name['givenName']} {account_name['sn']} added!\n"
-                )
+                logging.info(f"User {account_name['givenName']} {account_name['sn']} added!")
 
     # Check if the user needs to be removed
     for account_name in zabbix_user_list:
@@ -110,16 +107,17 @@ def compare_users_function(zabbix_conn_obj, zabbix_user_list, ldap_user_list, bi
         ):
             continue
         elif account_name['alias'] not in ldap_login_list:
-            result = zabbix_conn_obj.delete_zabbix_users_function(account_name['userid'])
+            result = zabbix_conn_obj.delete_zabbix_users_function(
+                account_name['userid'],
+                account_name['name'],
+                account_name['surname']
+            )
             if result == 1:
-                current_time = datetime.datetime.now()
-                print(
-                    current_time.strftime("[%Y-%m-%d %H:%M:%S]"),
-                    f"User {account_name['name']} {account_name['surname']} removed!\n"
-                )
+                logging.info(f"User {account_name['name']} {account_name['surname']} removed!")
 
 
-if __name__ == "__main__":
+def main():
+
     zabbix_server_input = input()
     zabbix_user_input = input()
     zabbix_pass_input = input()
@@ -129,6 +127,39 @@ if __name__ == "__main__":
     ldap_password_input = input()
     ldap_basedn_input = input()
     ldap_memberof_input = input()
+
+    logging.basicConfig(
+        level=logging.INFO,
+        filename='zabbix-ldap.log',
+        filemode='a',
+        format='[%(asctime)s] - %(levelname)s: %(message)s, ',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    if zabbix_server_input == '':
+        logging.error('Missing "zabbix_server" parameter to complete the connection.')
+        sys.exit()
+    if zabbix_user_input == '':
+        logging.error('Missing "zabbix_user" parameter to complete the connection.')
+        sys.exit()
+    if zabbix_pass_input == '':
+        logging.error('Missing "zabbix_passowrd" parameter to complete the connection.')
+        sys.exit()
+    if ldap_server_input == '':
+        logging.error('Missing "ldap_server" parameter to complete the connection.')
+        sys.exit()
+    if ldap_username_input == '':
+        logging.error('Missing "ldap_user" parameter to complete the connection.')
+        sys.exit()
+    if ldap_password_input == '':
+        logging.error('Missing "ldap_password" parameter to complete the connection.')
+        sys.exit()
+    if ldap_basedn_input == '':
+        logging.error('Missing "ldap_basedn" parameter to complete the connection.')
+        sys.exit()
+    if ldap_memberof_input == '':
+        logging.error('Missing "ldap_memberof" parameter to complete the connection.')
+        sys.exit()
 
     compare_obj = ZabbixLDAPIntegration(
         zabbix_server_input,
@@ -141,11 +172,13 @@ if __name__ == "__main__":
         ldap_memberof_input
     )
 
-    start_time = datetime.datetime.now()
-    print(start_time.strftime("[%Y-%m-%d %H:%M:%S]"), "Begin of the script.")
+    logging.info('Begin of the script.')
     zbx_usr_list = compare_obj.get_zabbix_users_function()
     ldap_usr_list = compare_obj.get_ldap_users_function()
     compare_users_function(compare_obj, zbx_usr_list, ldap_usr_list, zabbix_user_input)
-    finish_time = datetime.datetime.now()
-    print(finish_time.strftime("[%Y-%m-%d %H:%M:%S]"), "End of the script.")
-    exit()
+    logging.info('End of the script.')
+    sys.exit()
+
+
+if __name__ == "__main__":
+    main()
