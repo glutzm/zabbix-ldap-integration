@@ -7,6 +7,7 @@
 
 import ldap3
 import sys
+import logging
 
 
 # This class receives the following parameters to initialize your object:
@@ -40,14 +41,17 @@ class LDAPQuery:
             self.server.protocol_version = ldap3.version
             ldap_conn = ldap3.Connection(self.server, self.username, self.password)
             ldap_conn.bind()
+            logging.info("Bind successful.")
         except ldap3.core.exceptions.LDAPInvalidCredentialsResult:
-            print("Your username or password is incorrect.")
+            logging.error("Your username or password is incorrect.")
             sys.exit(0)
         except ldap3.core.exceptions.LDAPBindError as e:
             if type(e.message) == dict and 'desc' in e.message:
-                print(e.message['desc'])
+                error_value = e.message['desc']
+                str(error_value)
+                logging.error("Failed to bind!\n", error_value)
             else:
-                print(e)
+                logging.exception("Failed to bind!")
             sys.exit(0)
         return ldap_conn
 
@@ -72,33 +76,8 @@ class LDAPQuery:
                     users.append(dict(entry['attributes']))
                 except KeyError:
                     continue
-        except ldap3.core.exceptions.LDAPBindError as e:
-            print(e)
+        except ldap3.core.exceptions.LDAPBindError:
+            logging.exception("Failed to bind!")
         # unbind the session with the LDAP/AD server
         ldap_conn.unbind()
         return users
-
-
-# Script beginning
-if __name__ == "__main__":
-    server_input = input(
-        "Enter the server connection:\n"
-        "e.g.: 'ldaps://auth.test.com:636'\n"
-    )
-    username_input = input(
-        "Enter user to bind the ldap/ad:\n"
-        "e.g.: 'CN=Path,OU=To,OU=ReadUser,DC=test,DC=com'\n"
-    )
-    password_input = input(
-        "Enter the user password:\n"
-    )
-    basedn_input = input(
-        "Enter the base DN to search through:\n"
-        "e.g.: 'DC=test,DC=com'\n"
-    )
-    memberof_input = input(
-        "Enter member group do filter users:\n"
-        "e.g.: 'CN=zabbix.admins,OU=PathTo,OU=UserGroupWithAccess,DC=test,DC=com'\n"
-    )
-    query_object = LDAPQuery(server_input, username_input, password_input, basedn_input, memberof_input)
-    print(query_object.ldap_search(query_object.ldap_bind()))
