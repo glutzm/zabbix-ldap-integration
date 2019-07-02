@@ -16,6 +16,11 @@ use it you have to manually add the user to Zabbix frontend.
   - ldap3
 - Zabbix 4.2 (only version tested)
 
+⚠ *Warnings*
+
+> *The script at the moment only creates and deletes users based on a single AD group, if you
+plan to have separate functions like viewer, editor and admin, it is not implemented yet.*
+
 ## How to use
 
 > You can create a cron job that calls the script "zabbix_ldap_integration.py" and 
